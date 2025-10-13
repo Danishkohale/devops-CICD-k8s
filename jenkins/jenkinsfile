@@ -1,0 +1,71 @@
+pipeline {
+    agent any
+
+    environment {
+        AWS_REGION = 'us-east-1'
+        ECR_REPO_FRONTEND = '12567322123.dkr.ecr.us-east-1.amazonaws.com/frontend'
+        ECR_REPO_BACKEND = '12567322123.dkr.ecr.us-east-1.amazonaws.com/backend'
+        AWS_CREDENTIALS = credentials('aws-credentials') 
+    }
+
+    stages {
+        stage('Checkout Code') {
+            steps {
+                git branch: 'main', url: 'https://github.com/yourusername/yourrepo.git'
+            }
+        }
+
+        stage('Login to AWS ECR') {
+            steps {
+                script {
+                    sh '''
+                    aws configure set aws_access_key_id ${AWS_CREDENTIALS_USR}
+                    aws configure set aws_secret_access_key ${AWS_CREDENTIALS_PSW}
+                    aws configure set default.region ${AWS_REGION}
+                    aws ecr get-login-password --region ${AWS_REGION} | docker login --username AWS --password-stdin 123456789012.dkr.ecr.${AWS_REGION}.amazonaws.com
+                    '''
+                }
+            }
+        }
+
+        stage('Build Docker Images') {
+            steps {
+                script {
+                    sh '''
+                    docker build -t ${ECR_REPO_FRONTEND}:latest ./frontend
+                    docker build -t ${ECR_REPO_BACKEND}:latest ./backend
+                    '''
+                }
+            }
+        }
+
+        stage('Push Docker Images to ECR') {
+            steps {
+                script {
+                    sh '''
+                    docker push ${ECR_REPO_FRONTEND}:latest
+                    docker push ${ECR_REPO_BACKEND}:latest
+                    '''
+                }
+            }
+        }
+
+        stage('Deploy to Kubernetes') {
+            steps {
+                script {
+                   
+                   
+                        sh '''
+                     
+                        kubectl apply -f k8s/backend-deployment.yaml
+                        kubectl apply -f k8s/backend-service.yaml
+                        kubectl apply -f k8s/frontend-deployment.yaml
+                        kubectl apply -f k8s/frontend-service.yaml
+                        '''
+                    
+                }
+            }
+        }
+    }
+
+}
