@@ -1,9 +1,10 @@
-FROM ubuntu:22.04
+FROM golang:1.21-alpine
 
 # Install Go, Git, and any dependencies
-RUN apt-get update && \
-    apt-get install -y golang-go git curl && \
-    rm -rf /var/lib/apt/lists/*
+RUN apk add --no-cache git curl
+# RUN apt-get update && \
+#     apt-get install -y golang-go git curl && \
+#     rm -rf /var/lib/apt/lists/*
 
 # Set working directory
 WORKDIR /app
