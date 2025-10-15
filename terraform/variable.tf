@@ -1,5 +1,5 @@
 variable "key_name" {
-  default = "my-key"
+  default = "ner-terrform"
 }
 
 variable "instance_type" {
@@ -7,13 +7,11 @@ variable "instance_type" {
 }
 
 variable "ami_id" {
-  default = "ami-0e306788ff2473ccb"
+  default = "ami-0360c520857e3138f"
 }
 
-variable "jenkins_name" {
-  default = "jenkins"
+variable "vpc_id" {
+  default = "vpc-0088e74a5cb444339"
 }
 
-variable "k8s_name" {
-  default = "k8s"
-}
+  

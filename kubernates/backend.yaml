@@ -2,8 +2,9 @@ apiVersion: apps/v1
 kind: Deployment
 metadata:
   name: backend
+  namespace: dev
 spec:
-  replicas: 2
+  replicas: 1
   selector:
     matchLabels:
       app: backend
@@ -13,21 +14,8 @@ spec:
         app: backend
     spec:
       containers:
-      - name: backend
-        image: 12567322123.dkr.ecr.us-east-1.amazonaws.com/frontend
-        ports:
-        - containerPort: 5000
-        env:
-        - name: DB_HOST
-          value: postgres
-        - name: DB_USER
-          value: admin
-        - name: DB_PASSWORD
-          valueFrom:
-            secretKeyRef:
-              name: postgres-secret
-              key: POSTGRES_PASSWORD
-        - name: DB_NAME
-          value: mydb
-        - name: DB_PORT
-          value: "5432"
+        - name: backend
+          image: 424299668649.dkr.ecr.us-east-1.amazonaws.com/backend
+          ports:
+            - containerPort: 8080
+         

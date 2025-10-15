@@ -1,2 +1,6 @@
 .idea
 frontend/node_modules
+cd-pipeline
+cd-pipeline-2
+cd-2
+terraform/provider.tf

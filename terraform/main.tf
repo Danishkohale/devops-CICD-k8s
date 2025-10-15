@@ -1,90 +1,67 @@
-resource "aws_security_group" "jenkins_sg" {
-  name        = var.jenkins_name
-  
+
+data "aws_subnet" "default" {
+  availability_zone = "us-east-1a"
+  default_for_az    = true
+}
+resource "aws_security_group" "docker" {
+  name        = "docker"
+  description = "Allow 8080 and 3000 ports"
+  vpc_id      = "vpc-0088e74a5cb444339"
 
   ingress {
-    from_port   = 22
-    to_port     = 22
-    protocol    = "tcp"
-    cidr_blocks = ["0.0.0.0/0"]
-  }
-
-  ingress {
+    description = "Allow HTTP on port 8080"
     from_port   = 8080
     to_port     = 8080
     protocol    = "tcp"
     cidr_blocks = ["0.0.0.0/0"]
   }
 
-  egress {
-    from_port   = 0
-    to_port     = 0
-    protocol    = "-1"
-    cidr_blocks = ["0.0.0.0/0"]
-  }
-}
-
-resource "aws_security_group" "k8s_sg" {
-  name        = var.k8s_name
-
   ingress {
-    from_port   = 0
-    to_port     = 65535
+    description = "Allow frontend on port 3000"
+    from_port   = 3000
+    to_port     = 3000
     protocol    = "tcp"
     cidr_blocks = ["0.0.0.0/0"]
   }
 
   egress {
+    description = "Allow all outbound traffic"
     from_port   = 0
     to_port     = 0
     protocol    = "-1"
     cidr_blocks = ["0.0.0.0/0"]
   }
-}
-
-
-resource "aws_instance" "jenkins" {
-  ami                    = var.ami_id
-  instance_type          = var.instance_type
-  key_name               = var.key_name
-  security_groups        = [aws_security_group.jenkins_sg.name]
-
-  user_data = <<-EOF
-              #!/bin/bash
-              yum update -y
-              yum install -y java-11-amazon-corretto
-              wget -O /etc/yum.repos.d/jenkins.repo https://pkg.jenkins.io/redhat-stable/jenkins.repo
-              rpm --import https://pkg.jenkins.io/redhat-stable/jenkins.io.key
-              yum install -y jenkins git docker
-              systemctl enable jenkins
-              systemctl start jenkins
-              systemctl enable docker
-              systemctl start docker
-              usermod -aG docker jenkins
-              EOF
 
   tags = {
-    Name = "Jenkins-Server"
+    Name = "docker"
   }
 }
 
-resource "aws_instance" "k8s_node" {
-  ami                    = var.ami_id
-  instance_type          = "t2.medium"
-  key_name               = var.key_name
-  security_groups        = [aws_security_group.k8s_sg.name]
+resource "aws_instance" "docker" {
+  ami                         = var.ami_id
+  instance_type               = var.instance_type
+  subnet_id                   = data.aws_subnet.default.id
+  vpc_security_group_ids       = [aws_security_group.docker.id]
+  key_name                    = var.key_name
 
   user_data = <<-EOF
-              #!/bin/bash
-              yum update -y
-              yum install -y docker conntrack
-              systemctl enable docker && systemctl start docker
-              curl -LO https://storage.googleapis.com/minikube/releases/latest/minikube-linux-amd64
-              install minikube-linux-amd64 /usr/local/bin/minikube
-              minikube start --driver=docker
-              EOF
+                 
+                 #!/bin/bash
+                 sudo apt update
+                 sudo apt-get install unzip
+                 sudo apt install -y curl wget apt-transport-https
+                 sudo apt install -y docker.io
+                 sudo systemctl enable --now docker
+                 sudo usermod -aG docker $USER && newgrp docker
+                 curl "https://awscli.amazonaws.com/awscli-exe-linux-x86_64.zip" -o "awscliv2.zip"
+                 unzip awscliv2.zip
+                 sudo ./aws/install
+                 
+                EOF
+
 
   tags = {
-    Name = "K8s-Cluster"
+    Name = "docker"
   }
 }
+
