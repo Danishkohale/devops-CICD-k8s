@@ -13,12 +13,13 @@ spec:
       labels:
         app: frontend
     spec:
+      imagePullSecrets:
+        - name: ecr-secret
       containers:
         - name: frontend
-
-          image: 424299668649.dkr.ecr.us-east-1.amazonaws.com/frontend
+          image: danikohale/frontend:latest
           ports:
             - containerPort: 3000
           env:
-            - name: REACT_APP_API
-              value: "http://backend.dev.svc.cluster.local:8080"
+            - name: REACT_APP_SERVER_URL
+              value: "http://backend-service:8080/employees"

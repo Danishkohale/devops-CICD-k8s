@@ -15,7 +15,19 @@ spec:
     spec:
       containers:
         - name: backend
-          image: 424299668649.dkr.ecr.us-east-1.amazonaws.com/backend
+          image: danikohale/backend:latest
           ports:
             - containerPort: 8080
-         
+          env:
+            - name: DB_HOST
+              value: "34.224.169.190"
+            - name: DB_USER
+              value: "danish"
+            - name: DB_PASSWORD
+              value: "admin123"
+            - name: DB_NAME
+              value: "company"
+            - name: DB_PORT
+              value: "5432"
+            - name: ALLOWED_ORIGINS
+              value: "http://frontend-service:3000"

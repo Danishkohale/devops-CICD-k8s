@@ -3,6 +3,7 @@ variable "key_name" {
 }
 
 variable "instance_type" {
+  
   default = "t2.medium"
 }
 
@@ -12,6 +13,10 @@ variable "ami_id" {
 
 variable "vpc_id" {
   default = "vpc-0088e74a5cb444339"
+}
+
+variable "k8s_instance" {
+  default = "t3.large"
 }
 
   

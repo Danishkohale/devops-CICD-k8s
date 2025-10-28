@@ -12,12 +12,12 @@ WORKDIR /app
 # Copy the rest of the source code
 COPY . .
 
-ENV DB_HOST="34.227.75.228" \
+ENV DB_HOST="34.224.169.190" \
     DB_USER="danish" \
     DB_PASSWORD="admin123" \
     DB_NAME="company" \
     DB_PORT="5432" \
-    ALLOWED_ORIGINS="http://54.221.31.154:3000"
+    ALLOWED_ORIGINS="http://frontend-service:3000"
 
 RUN go get ./...
 
