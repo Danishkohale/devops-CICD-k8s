@@ -1,0 +1,36 @@
+name: Deploy to Kubernetes
+
+on:
+  workflow_run:
+    workflows: ["CI Pipeline"]
+    types:
+      - completed
+
+   push:
+    branches:
+      - main
+
+jobs:
+  deploy:
+    runs-on: k8s
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Deploy Backend
+        run: kubectl apply -f k8s/backend.yaml
+        run: kubectl apply -f k8s/backend-service.yaml
+
+      - name: Deploy Frontend
+        run: kubectl apply -f k8s/frontend.yaml
+         run: kubectl apply -f k8s/frontend-service.yaml
+
+      -  name: Deploy Frontend
+         run: kubectl apply -f k8s/frontend.yaml
+         run: kubectl apply -f k8s/frontend-service.yaml
+
+      - name: Check rollout status
+        run: |
+          kubectl rollout status deployment/backend
+          kubectl rollout status deployment/frontend
