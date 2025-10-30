@@ -22,4 +22,4 @@ spec:
             - containerPort: 3000
           env:
             - name: REACT_APP_SERVER_URL
-              value: "http://backend-service:8080/employees"
+              value: "http://LB_backend:8080/employees"
